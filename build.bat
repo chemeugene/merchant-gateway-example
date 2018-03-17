@@ -1,4 +1,4 @@
 @echo off
 cls
-call gradlew.bat build
+call gradlew.bat clean build
 pause
