@@ -1,13 +1,13 @@
-package ru.allreciepes.merchant.service.impl;
+package ru.allrecipes.merchant.service.impl;
 
 import java.util.List;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import ru.allreciepes.merchant.domain.Invoice;
-import ru.allreciepes.merchant.repository.InvoiceRepository;
-import ru.allreciepes.merchant.service.InvoiceService;
+import ru.allrecipes.merchant.domain.Invoice;
+import ru.allrecipes.merchant.repository.InvoiceRepository;
+import ru.allrecipes.merchant.service.InvoiceService;
 
 @Service
 @Transactional

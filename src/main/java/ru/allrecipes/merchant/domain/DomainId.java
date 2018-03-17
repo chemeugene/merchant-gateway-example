@@ -1,4 +1,4 @@
-package ru.allreciepes.merchant.domain;
+package ru.allrecipes.merchant.domain;
 
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;

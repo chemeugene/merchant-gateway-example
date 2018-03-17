@@ -1,4 +1,4 @@
-package ru.allreciepes.merchant;
+package ru.allrecipes.merchant;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

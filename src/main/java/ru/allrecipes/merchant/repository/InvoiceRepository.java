@@ -1,10 +1,10 @@
-package ru.allreciepes.merchant.repository;
+package ru.allrecipes.merchant.repository;
 
 import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import ru.allreciepes.merchant.domain.Invoice;
+import ru.allrecipes.merchant.domain.Invoice;
 
 public interface InvoiceRepository extends JpaRepository<Invoice, Long> {
   

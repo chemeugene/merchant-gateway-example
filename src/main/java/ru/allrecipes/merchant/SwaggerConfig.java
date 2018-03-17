@@ -1,4 +1,4 @@
-package ru.allreciepes.merchant;
+package ru.allrecipes.merchant;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

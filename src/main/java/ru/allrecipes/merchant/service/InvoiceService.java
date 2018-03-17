@@ -1,8 +1,8 @@
-package ru.allreciepes.merchant.service;
+package ru.allrecipes.merchant.service;
 
 import java.util.List;
 
-import ru.allreciepes.merchant.domain.Invoice;
+import ru.allrecipes.merchant.domain.Invoice;
 
 public interface InvoiceService {
 

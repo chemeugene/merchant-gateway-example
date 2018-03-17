@@ -1,4 +1,4 @@
-package ru.allreciepes.merchant.controller;
+package ru.allrecipes.merchant.controller;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -9,8 +9,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import ru.allreciepes.merchant.domain.Invoice;
-import ru.allreciepes.merchant.service.InvoiceService;
+import ru.allrecipes.merchant.domain.Invoice;
+import ru.allrecipes.merchant.service.InvoiceService;
 
 @RestController
 @RequestMapping(value = "/api/v1", method = RequestMethod.GET, produces = {

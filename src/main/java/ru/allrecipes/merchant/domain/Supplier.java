@@ -1,6 +1,7 @@
-package ru.allreciepes.merchant.domain;
+package ru.allrecipes.merchant.domain;
 
 import javax.persistence.Entity;
+import javax.persistence.Id;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -13,10 +14,10 @@ import lombok.Setter;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor
-public class Customer extends DomainId {
+public class Supplier extends DomainId {
 
-  private String username;
-  
-  private String email;
-  
+  @Id
+  private Long id;
+
+  private String name;
 }

@@ -1,4 +1,4 @@
-package ru.allreciepes.merchant.domain;
+package ru.allrecipes.merchant.domain;
 
 import java.time.OffsetDateTime;
 
@@ -24,6 +24,9 @@ public class Invoice extends DomainId {
 
   @ManyToOne
   private Supplier supplier;
+  
+  @ManyToOne
+  private Customer customer;
 
   private String caption;
 
