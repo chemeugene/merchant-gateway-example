@@ -1,5 +1,5 @@
 configurations {
-    jaxb
+    jaxws
 }
 
 buildscript {
@@ -38,37 +38,25 @@ repositories {
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
-task genJaxb {
-    ext.sourcesDir = "${buildDir}/generated-sources/jaxb"
-    ext.classesDir = "${buildDir}/classes/jaxb"
-    ext.schema = "https://web.rbsuat.com/ab/webservices/merchant-ws?wsdl=MerchantService.wsdl"
-
-    outputs.dir classesDir
-
-    doLast() {
-        project.ant {
-            taskdef name: "xjc", classname: "com.sun.tools.xjc.XJCTask",
-                    classpath: configurations.jaxb.asPath
-            mkdir(dir: sourcesDir)
-            mkdir(dir: classesDir)
-
-            xjc(destdir: sourcesDir, schema: schema, package: "ru.allrecipes.merchant.bank.alfabank.wsdl") {
-                arg(value: "-wsdl")
-                produces(dir: sourcesDir, includes: "**/*.java")
-            }
-
-            javac(destdir: classesDir, source: 1.8, target: 1.8, debug: true,
-                    debugLevel: "lines,vars,source",
-                    classpath: configurations.jaxb.asPath) {
-                src(path: sourcesDir)
-                include(name: "**/*.java")
-                include(name: "*.java")
-            }
-
-            copy(todir: classesDir) {
-                fileset(dir: sourcesDir, erroronmissingdir: false) {
-                    exclude(name: "**/*.java")
-                }
+task wsimport {
+    ext.destDir = file("${buildDir}/generated-sources/jaxb")
+    doLast {
+        ant {
+            sourceSets.main.output.classesDir.mkdirs()
+            destDir.mkdirs()
+            taskdef(name: 'wsimport',
+                    classname: 'com.sun.tools.ws.ant.WsImport',
+                    classpath: configurations.jaxws.asPath
+            )
+            wsimport(keep: true,
+                    destdir: sourceSets.main.output.classesDir,
+                    sourcedestdir: destDir,
+                    extension: "true",
+                    verbose: "false",
+                    quiet: "false",
+                    xnocompile: "true",
+                    wsdl: 'https://web.rbsuat.com/ab/webservices/merchant-ws?wsdl') {
+                xjcarg(value: "-XautoNameResolution")
             }
         }
     }
@@ -84,18 +72,24 @@ dependencies {
 	compile "org.postgresql:postgresql:42.1.4"
 	compile "io.springfox:springfox-swagger2:2.6.1"
     compile "io.springfox:springfox-swagger-ui:2.6.1"
-    compile(files(genJaxb.classesDir).builtBy(genJaxb))
+    compile(files(wsimport.destDir).builtBy(wsimport))
     
-    jaxb "com.sun.xml.bind:jaxb-xjc:2.1.7"
+    //jaxb "com.sun.xml.bind:jaxb-xjc:2.1.7"
+    jaxws "com.sun.xml.ws:jaxws-tools:2.1.4"
 	
 	testCompile "org.springframework.boot:spring-boot-starter-test"
+}
+
+compileJava {
+    dependsOn wsimport
+    source wsimport.destDir
 }
 
 bootJar {
     baseName = "${artifactId}"
     version =  "${artifactVersion}"
-
-    from genJaxb.classesDir
+    
+    from wsimport.destDir
 }
 
 configurations {
@@ -142,7 +136,7 @@ task installAngular(type:Exec) {
 }
 
 task afterEclipseImport {
-    dependsOn genJaxb
+    dependsOn wsimport
 }
 
 eclipse {
