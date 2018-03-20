@@ -40,6 +40,7 @@ targetCompatibility = 1.8
 
 task wsimport {
     ext.destDir = file("${buildDir}/generated-sources/jaxb")
+    ext.classesDir = sourceSets.main.output.classesDir
     doLast {
         ant {
             sourceSets.main.output.classesDir.mkdirs()
@@ -49,7 +50,7 @@ task wsimport {
                     classpath: configurations.jaxws.asPath
             )
             wsimport(keep: true,
-                    destdir: sourceSets.main.output.classesDir,
+                    destdir: classesDir,
                     sourcedestdir: destDir,
                     extension: "true",
                     verbose: "false",
@@ -72,7 +73,7 @@ dependencies {
 	compile "org.postgresql:postgresql:42.1.4"
 	compile "io.springfox:springfox-swagger2:2.6.1"
     compile "io.springfox:springfox-swagger-ui:2.6.1"
-    compile(files(wsimport.destDir).builtBy(wsimport))
+    compile(files(wsimport.classesDir).builtBy(wsimport))
     
     //jaxb "com.sun.xml.bind:jaxb-xjc:2.1.7"
     jaxws "com.sun.xml.ws:jaxws-tools:2.1.4"
