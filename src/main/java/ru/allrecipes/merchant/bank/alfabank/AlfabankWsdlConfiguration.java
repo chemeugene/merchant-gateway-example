@@ -4,6 +4,9 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.oxm.jaxb.Jaxb2Marshaller;
 
+import ru.bpc.phoenix.web.api.merchant.soap.MerchantService;
+import ru.bpc.phoenix.web.api.merchant.soap.MerchantServiceImplService;
+
 @Configuration
 public class AlfabankWsdlConfiguration {
 
@@ -22,7 +25,8 @@ public class AlfabankWsdlConfiguration {
   /**
    * AlfabankClient.
    * 
-   * @param marshaller {@link Jaxb2Marshaller}
+   * @param marshaller
+   *          {@link Jaxb2Marshaller}
    * @return {@link AlfabankClient}
    */
   @Bean
@@ -33,5 +37,4 @@ public class AlfabankWsdlConfiguration {
     client.setUnmarshaller(marshaller);
     return client;
   }
-
 }

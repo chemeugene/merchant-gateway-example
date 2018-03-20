@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 import ru.allrecipes.merchant.domain.Invoice;
 import ru.allrecipes.merchant.domain.InvoicePaymentRequest;
 import ru.allrecipes.merchant.service.InvoiceService;
+import ru.bpc.phoenix.web.api.merchant.soap.MerchantServiceImplService;
 
 @RestController
 @RequestMapping(value = "/api/v1", method = RequestMethod.GET, produces = {
@@ -25,9 +26,12 @@ import ru.allrecipes.merchant.service.InvoiceService;
 public class InvoiceController {
 
   private InvoiceService invoiceService;
+  
+  private MerchantServiceImplService merchantService;
 
-  public InvoiceController(InvoiceService invoiceService) {
+  public InvoiceController(InvoiceService invoiceService, MerchantServiceImplService merchantService) {
     this.invoiceService = invoiceService;
+    this.merchantService = merchantService;
   }
 
   @GetMapping(value = "/invoicesByCustomerUsername")
