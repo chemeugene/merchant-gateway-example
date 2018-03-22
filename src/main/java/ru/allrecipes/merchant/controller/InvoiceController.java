@@ -4,8 +4,6 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import java.util.List;
 
-import javax.validation.Valid;
-
 import org.springframework.util.MimeTypeUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -17,7 +15,6 @@ import org.springframework.web.bind.annotation.RestController;
 import ru.allrecipes.merchant.domain.Invoice;
 import ru.allrecipes.merchant.domain.InvoicePaymentRequest;
 import ru.allrecipes.merchant.service.InvoiceService;
-import ru.bpc.phoenix.web.api.merchant.soap.MerchantServiceImplService;
 
 @RestController
 @RequestMapping(value = "/api/v1", method = RequestMethod.GET, produces = {
@@ -26,12 +23,9 @@ import ru.bpc.phoenix.web.api.merchant.soap.MerchantServiceImplService;
 public class InvoiceController {
 
   private InvoiceService invoiceService;
-  
-  private MerchantServiceImplService merchantService;
 
-  public InvoiceController(InvoiceService invoiceService, MerchantServiceImplService merchantService) {
+  public InvoiceController(InvoiceService invoiceService) {
     this.invoiceService = invoiceService;
-    this.merchantService = merchantService;
   }
 
   @GetMapping(value = "/invoicesByCustomerUsername")
@@ -42,8 +36,8 @@ public class InvoiceController {
 
   @PostMapping(value = "/payInvoice")
   @ApiOperation(value = "Pay invoices (1..n)")
-  public void payInvoice(@RequestBody @Valid InvoicePaymentRequest request) {
-
+  public void payInvoice(@RequestBody InvoicePaymentRequest request) {
+    invoiceService.payInvoice(null);
   }
 
 }
