@@ -9,6 +9,7 @@ import ru.allrecipes.merchant.domain.Invoice;
 import ru.allrecipes.merchant.domain.InvoicePaymentRequest;
 import ru.allrecipes.merchant.repository.InvoiceRepository;
 import ru.allrecipes.merchant.service.InvoiceService;
+import ru.allrecipes.merchant.system.HeaderHandlerResolver;
 import ru.bpc.phoenix.web.api.merchant.soap.MerchantServiceImplService;
 import ru.paymentgate.engine.webservices.merchant.OrderParams;
 import ru.paymentgate.engine.webservices.merchant.RegisterOrderResponse;
@@ -39,6 +40,7 @@ public class InvoiceServiceImpl implements InvoiceService {
     params.setMerchantOrderNumber("1");
     params.setAmount(10L);
     params.setReturnUrl("http://all-recipes.ru/success");
+    merchantService.setHandlerResolver(new HeaderHandlerResolver());
     RegisterOrderResponse response = merchantService.getMerchantServiceImplPort()
         .registerOrder(params);
     System.out.println(response);
