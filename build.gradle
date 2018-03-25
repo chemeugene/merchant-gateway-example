@@ -74,6 +74,7 @@ dependencies {
 	compile "io.springfox:springfox-swagger2:2.6.1"
     compile "io.springfox:springfox-swagger-ui:2.6.1"
     compile(files(wsimport.classesDir).builtBy(wsimport))
+    compile('org.apache.tomcat.embed:tomcat-embed-jasper' ,'javax.servlet:jstl')
     
     //jaxb "com.sun.xml.bind:jaxb-xjc:2.1.7"
     jaxws "com.sun.xml.ws:jaxws-tools:2.1.4"

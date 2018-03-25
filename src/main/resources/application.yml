@@ -12,6 +12,15 @@ alfabank:
   login: all_recipes_test-api
   password: all_recipes_test*?1    
 spring:
+  mvc:
+    view:
+      prefix: /WEB-INF/jsp/
+      suffix: .jsp
+  http:
+    encoding:
+      charset: UTF-8
+      enabled: true
+      force: true    
   datasource:
     driverClassName: org.postgresql.Driver
     url: jdbc:postgresql://localhost:5432/merchant
