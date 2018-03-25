@@ -70,7 +70,7 @@ public class InvoiceServiceImpl implements InvoiceService {
   @Override
   public InvoicePaymentResponse payInvoice(InvoicePaymentRequest request) {
 
-    List<Invoice> invoices = invoiceRepository.findAllById(request.getInvoiceIds());
+    List<Invoice> invoices = invoiceRepository.findByInvoiceIdIn(request.getInvoiceIds());
     List<InvoicePaymentStatus> errors = invoices.stream()
         .filter(invoice -> State.PAID == invoice.getState())
         .map(invoice -> InvoicePaymentStatus.builder().invoiceId(invoice.getId())
@@ -91,7 +91,7 @@ public class InvoiceServiceImpl implements InvoiceService {
     for (Invoice invoice : invoices) {
       try {
         OrderParams params = new OrderParams();
-        params.setMerchantOrderNumber(invoice.getId().toString());
+        params.setMerchantOrderNumber(invoice.getInvoiceId().toString());
         params.setAmount(invoice.getAmount().longValue());
         params.setReturnUrl(
             ServletUriComponentsBuilder.fromCurrentContextPath().build().toUriString());

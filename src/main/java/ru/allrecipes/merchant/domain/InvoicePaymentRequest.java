@@ -18,6 +18,6 @@ public class InvoicePaymentRequest {
 
   @NotNull
   @Size(min = 1)
-  private Set<Long> invoiceIds;
+  private Set<Integer> invoiceIds;
 
 }
