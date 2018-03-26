@@ -1,7 +1,5 @@
 package ru.allrecipes.merchant;
 
-import java.util.Random;
-
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.stereotype.Component;
@@ -9,7 +7,6 @@ import org.springframework.stereotype.Component;
 import lombok.extern.slf4j.Slf4j;
 import ru.allrecipes.merchant.domain.Customer;
 import ru.allrecipes.merchant.domain.Invoice;
-import ru.allrecipes.merchant.domain.Invoice.State;
 import ru.allrecipes.merchant.domain.Supplier;
 import ru.allrecipes.merchant.repository.CustomerRepository;
 import ru.allrecipes.merchant.repository.InvoiceRepository;
@@ -52,17 +49,18 @@ public class AppInit implements ApplicationRunner {
     
     invoice1.setAmount(100d);
     invoice1.setSupplier(suplier1);
-    invoice1.setState(State.NEW);
     invoice1.setCustomer(customer);
 
     Invoice invoice2 = new Invoice();
     invoice2.setAmount(150d);
     invoice2.setSupplier(suplier2);
-    invoice2.setState(State.NEW);
     invoice2.setCustomer(customer);
 
     invoiceRepository.save(invoice1);
     invoiceRepository.save(invoice2);
+    
+    log.info("Invoice 1 id {}", invoice1.getInvoiceId());
+    log.info("Invoice 2 id {}", invoice2.getInvoiceId());
   }
 
 }

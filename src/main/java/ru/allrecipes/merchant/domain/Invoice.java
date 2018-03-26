@@ -22,10 +22,6 @@ import lombok.Setter;
 @NoArgsConstructor
 public class Invoice extends DomainId {
 
-  public static enum State {
-    NEW, PAID, LOCKED
-  }
-
   @ManyToOne
   private Supplier supplier;
 
@@ -44,8 +40,6 @@ public class Invoice extends DomainId {
   private OffsetDateTime createdDate;
 
   private OffsetDateTime paidDate;
-
-  private State state;
 
   @PrePersist
   private void prePersit() {

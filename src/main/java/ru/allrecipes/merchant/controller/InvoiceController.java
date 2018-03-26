@@ -4,8 +4,12 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.List;
+import java.util.stream.Collectors;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.ui.ModelMap;
@@ -16,15 +20,17 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import org.springframework.web.util.UriComponentsBuilder;
 
+import ru.allrecipes.merchant.Constants;
 import ru.allrecipes.merchant.domain.Card;
 import ru.allrecipes.merchant.domain.Invoice;
 import ru.allrecipes.merchant.domain.InvoicePaymentRequest;
 import ru.allrecipes.merchant.domain.InvoicePaymentResponse;
+import ru.allrecipes.merchant.domain.InvoicePaymentResponse.BulkStatus;
 import ru.allrecipes.merchant.service.InvoiceService;
 import ru.allrecipes.merchant.system.InvoiceSession;
 import ru.paymentgate.engine.webservices.merchant.PaymentOrderResult;
@@ -52,14 +58,20 @@ public class InvoiceController {
   @PostMapping(value = "/payInvoice")
   @ApiOperation(value = "Pay invoices (1..n)")
   public InvoicePaymentResponse payInvoice(@RequestBody InvoicePaymentRequest request,
-      HttpServletResponse httpResponse, RedirectAttributes redirectAttrs) throws IOException {
+      HttpServletRequest httpRequest, RedirectAttributes redirectAttrs)
+      throws IOException, URISyntaxException {
     InvoicePaymentResponse response = invoiceService.payInvoice(request);
-    if (response != null) {
+    if (response.getBulkStatus() != BulkStatus.OK) {
+      return response;
+    } else {
+      URI requestUri = new URI(httpRequest.getRequestURL().toString());
+      URI contextUri = new URI(requestUri.getScheme(), requestUri.getAuthority(),
+          httpRequest.getContextPath(), null, null);
+      response.setSuccessFormUrl(UriComponentsBuilder.fromUri(contextUri).path("/payment.html")
+          .queryParam(Constants.TOTAL_AMOUNT, response.getTotalAmount())
+          .queryParam(Constants.BULK_KEY_ATTR, request.hashCode()).build().encode().toUriString());
       return response;
     }
-    redirectAttrs.addFlashAttribute("bulkKey", request.hashCode());
-    httpResponse.sendRedirect("/payment.html");
-    return null;
   }
 
   @PostMapping(value = "/doPayment")
@@ -67,7 +79,9 @@ public class InvoiceController {
     List<PaymentOrderResult> errors = invoiceService.performPayment(card,
         invoiceSession.getOrdersByInvoiceKey(Integer.valueOf(card.getBulkRequestId())));
     if (errors != null) {
-      return "errorPage";
+      String errorsString = errors.stream().map(error -> error.getErrorMessage())
+          .collect(Collectors.joining(","));
+      return "errorPage: " + errorsString;
     } else {
       return "successPage";
     }

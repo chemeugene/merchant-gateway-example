@@ -17,6 +17,10 @@ public class InvoicePaymentResponse {
   
   private BulkStatus bulkStatus;
   
+  private Double totalAmount;
+  
+  private String successFormUrl;
+  
   public static enum BulkStatus {
     OK, PARTIAL, REJECTED
   }

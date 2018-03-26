@@ -2,18 +2,14 @@ package ru.allrecipes.merchant.service.impl;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.transaction.interceptor.TransactionAspectSupport;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import lombok.extern.slf4j.Slf4j;
 import ru.allrecipes.merchant.domain.Card;
 import ru.allrecipes.merchant.domain.Invoice;
-import ru.allrecipes.merchant.domain.Invoice.State;
 import ru.allrecipes.merchant.domain.InvoicePaymentRequest;
 import ru.allrecipes.merchant.domain.InvoicePaymentResponse;
 import ru.allrecipes.merchant.domain.InvoicePaymentResponse.BulkStatus;
@@ -30,8 +26,8 @@ import ru.paymentgate.engine.webservices.merchant.PaymentOrderResult;
 import ru.paymentgate.engine.webservices.merchant.RegisterOrderResponse;
 
 @Service
-@Transactional(isolation = Isolation.SERIALIZABLE)
 @Slf4j
+@Transactional
 public class InvoiceServiceImpl implements InvoiceService {
 
   private InvoiceRepository invoiceRepository;
@@ -71,23 +67,9 @@ public class InvoiceServiceImpl implements InvoiceService {
   public InvoicePaymentResponse payInvoice(InvoicePaymentRequest request) {
 
     List<Invoice> invoices = invoiceRepository.findByInvoiceIdIn(request.getInvoiceIds());
-    List<InvoicePaymentStatus> errors = invoices.stream()
-        .filter(invoice -> State.PAID == invoice.getState())
-        .map(invoice -> InvoicePaymentStatus.builder().invoiceId(invoice.getId())
-            .operationResult(OperationResult.ALREADY_PAID).build())
-        .collect(Collectors.toList());
-    errors.addAll(invoices.stream().filter(invoice -> State.LOCKED == invoice.getState())
-        .map(invoice -> InvoicePaymentStatus.builder().invoiceId(invoice.getId())
-            .operationResult(OperationResult.LOCKED).build())
-        .collect(Collectors.toList()));
-
-    if (!errors.isEmpty()) {
-      return InvoicePaymentResponse.builder().bulkStatus(BulkStatus.REJECTED).statuses(errors)
-          .build();
-    } else {
-      invoices.forEach(invoice -> invoice.setState(State.LOCKED));
-    }
+    List<InvoicePaymentStatus> errors = new ArrayList<>();
     List<RegisterOrderResponse> orders = new ArrayList<>();
+    Double totalAmount = 0d;
     for (Invoice invoice : invoices) {
       try {
         OrderParams params = new OrderParams();
@@ -100,9 +82,9 @@ public class InvoiceServiceImpl implements InvoiceService {
         if (response.getErrorCode() != 0) {
           errors.add(InvoicePaymentStatus.builder().invoiceId(invoice.getId())
               .operationResult(OperationResult.MERCHANT_ERROR).build());
-          TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
         } else {
           orders.add(response);
+          totalAmount += invoice.getAmount();
         }
       } catch (Exception e) {
         String errorDescription = "Unable to register invoice in payment gateway";
@@ -110,16 +92,16 @@ public class InvoiceServiceImpl implements InvoiceService {
         errors.add(InvoicePaymentStatus.builder().invoiceId(invoice.getId())
             .operationResult(OperationResult.MERCHANT_ERROR).errorDescription(errorDescription)
             .build());
-        TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
       }
     }
     if (!errors.isEmpty()) {
       return InvoicePaymentResponse.builder().bulkStatus(BulkStatus.REJECTED).statuses(errors)
           .build();
-    } else {
-      invoiceSession.addOrders(request.hashCode(), orders);
     }
-    return null;
+    invoiceSession.addOrders(request.hashCode(), orders);
+
+    return InvoicePaymentResponse.builder().totalAmount(totalAmount).bulkStatus(BulkStatus.OK)
+        .build();
   }
 
   @Override
@@ -137,7 +119,7 @@ public class InvoiceServiceImpl implements InvoiceService {
         errors.add(result);
       }
     }
-    if (errors.isEmpty()) {
+    if (!errors.isEmpty()) {
       return errors;
     }
     return null;
