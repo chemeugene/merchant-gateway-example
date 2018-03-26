@@ -20,6 +20,8 @@ Vagrant.configure("2") do |config|
     
     $script = <<-SCRIPT
      apt-get update
+     apt-get install nodejs
+     apt-get install npm
      sudo apt-get install -y python-software-properties debconf-utils
      add-apt-repository ppa:webupd8team/java
      apt-get update
