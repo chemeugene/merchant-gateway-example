@@ -7,10 +7,8 @@ Vagrant.configure("2") do |config|
   	machine.vm.box = "ubuntu/xenial64"
 	machine.ssh.insert_key = false
   	machine.vm.network "private_network", ip: "10.0.0.3"
-  	machine.vm.synced_folder "../", "/vagrant"
   	machine.vm.network "forwarded_port", guest: 8000, host: 8000, protocol: "tcp"
   	machine.vm.network "forwarded_port", guest: 5432, host: 5432, protocol: "tcp"
-  	machine.vm.network "forwarded_port", guest: 8080, host: 8080, protocol: "tcp"
   	machine.vm.network "forwarded_port", guest: 8443, host: 8443, protocol: "tcp"
   	
   	machine.vm.provider "virtualbox" do |vb|
@@ -20,8 +18,8 @@ Vagrant.configure("2") do |config|
     
     $script = <<-SCRIPT
      apt-get update
-     apt-get install nodejs
-     apt-get install npm
+     apt-get install nodejs -y
+     apt-get install npm -y
      sudo apt-get install -y python-software-properties debconf-utils
      add-apt-repository ppa:webupd8team/java
      apt-get update
