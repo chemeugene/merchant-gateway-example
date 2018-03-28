@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="INFO">
+
+    <Appenders>
+        <RollingFile name="default.file" fileName="./logs/default.log"
+            filePattern="${log-path}/nms-%d{yyyy-MM-dd}-%i.log" append="false">
+            <PatternLayout>
+                <pattern>%d{dd/MMM/yyyy HH:mm:ss,SSS}- %c{1}: %m%n</pattern>
+            </PatternLayout>
+            <Policies>
+                <SizeBasedTriggeringPolicy size="100 MB" />
+            </Policies>
+            <DefaultRolloverStrategy max="10" />
+        </RollingFile>
+
+        <Console name="STDOUT" target="SYSTEM_OUT">
+            <PatternLayout pattern="%m%n" />
+        </Console>
+    </Appenders>
+    <Loggers>
+        <Logger name="ru.allrecipes"
+            level="DEBUG" additivity="false">
+            <appender-ref ref="default.file" level="DEBUG" />
+            <appender-ref ref="STDOUT" level="DEBUG" />
+        </Logger>
+        
+        <Root level="INFO" additivity="false">
+            <appender-ref ref="STDOUT" level="INFO" />
+            <appender-ref ref="default.file" level="INFO" />
+        </Root>
+    </Loggers>
+</Configuration>
