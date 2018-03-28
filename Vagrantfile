@@ -6,21 +6,17 @@ Vagrant.configure("2") do |config|
   config.vm.define "merchant" do |machine|
   	machine.vm.box = "ubuntu/xenial64"
 	machine.ssh.insert_key = false
-  	machine.vm.network "private_network", ip: "10.0.0.3"
-  	machine.vm.network "forwarded_port", guest: 8000, host: 8000, protocol: "tcp"
-  	machine.vm.network "forwarded_port", guest: 5432, host: 5432, protocol: "tcp"
-  	machine.vm.network "forwarded_port", guest: 8443, host: 8443, protocol: "tcp"
+  	machine.vm.network "private_network", ip: "10.0.0.5"
   	
   	machine.vm.provider "virtualbox" do |vb|
      vb.gui = false
-     vb.memory = "4096"
+     vb.memory = "6144"
     end
     
     $script = <<-SCRIPT
      apt-get update
-     apt-get install nodejs -y
-     apt-get install npm -y
      sudo apt-get install -y python-software-properties debconf-utils
+     curl -sL https://deb.nodesource.com/setup_8.x | sudo -E bash -
      add-apt-repository ppa:webupd8team/java
      apt-get update
      echo "oracle-java8-installer shared/accepted-oracle-license-v1-1 select true" | sudo debconf-set-selections
@@ -35,7 +31,7 @@ Vagrant.configure("2") do |config|
      apt-get install nano -y
      cd /vagrant
      ./gradlew build
-     docker build -f docker/Dockerfile  -t ivlev/merchant:1 .
+     docker build -t merchant/merchant:1 .
      docker-compose up -d
     SCRIPT
     

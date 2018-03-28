@@ -2,12 +2,10 @@ package ru.allrecipes.merchant.service.impl;
 
 import java.util.ArrayList;
 import java.util.List;
-
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
-
-import lombok.extern.slf4j.Slf4j;
 import ru.allrecipes.merchant.domain.Card;
 import ru.allrecipes.merchant.domain.Invoice;
 import ru.allrecipes.merchant.domain.InvoicePaymentRequest;

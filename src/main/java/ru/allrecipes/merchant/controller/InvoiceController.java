@@ -7,10 +7,9 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
-
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.ui.ModelMap;
 import org.springframework.util.MimeTypeUtils;
@@ -20,17 +19,19 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import org.springframework.web.servlet.view.RedirectView;
 import org.springframework.web.util.UriComponentsBuilder;
-
 import ru.allrecipes.merchant.Constants;
 import ru.allrecipes.merchant.domain.Card;
 import ru.allrecipes.merchant.domain.Invoice;
 import ru.allrecipes.merchant.domain.InvoicePaymentRequest;
 import ru.allrecipes.merchant.domain.InvoicePaymentResponse;
 import ru.allrecipes.merchant.domain.InvoicePaymentResponse.BulkStatus;
+import ru.allrecipes.merchant.domain.InvoicesWrapper;
 import ru.allrecipes.merchant.service.InvoiceService;
 import ru.allrecipes.merchant.system.InvoiceSession;
 import ru.paymentgate.engine.webservices.merchant.PaymentOrderResult;
@@ -55,6 +56,44 @@ public class InvoiceController {
     return invoiceService.getInvoicesByCustomerUsername(username);
   }
 
+  /**
+   * Accepts invoices form.
+   * 
+   * @param invoiceWrapper - invoiceWrapper
+   * @param httpRequest - httpRequest
+   * @param redirectAttrs - redirectAttrs
+   * @return redirect to payment page
+   * @throws IOException - IOException
+   * @throws URISyntaxException - URISyntaxException
+   */
+  @RequestMapping(value = { "/payInvoiceForm" }, method = RequestMethod.POST)
+  public RedirectView payInvoiceForm(
+      @ModelAttribute("invoiceWrapper") InvoicesWrapper invoiceWrapper,
+      HttpServletRequest httpRequest, RedirectAttributes redirectAttrs)
+      throws IOException, URISyntaxException {
+    Set<Integer> invoiceIds = invoiceWrapper.getItems().stream().filter(item -> item.isEnabled())
+        .map(item -> item.getInvoiceId()).collect(Collectors.toSet());
+    InvoicePaymentRequest req = new InvoicePaymentRequest(invoiceIds);
+    InvoicePaymentResponse response = payInvoice(req, httpRequest, redirectAttrs);
+    RedirectView redirectView = new RedirectView(response.getSuccessFormUrl());
+    return redirectView;
+  }
+
+  /**
+   * Bulk operation - pay invoices.
+   * 
+   * @param request
+   *          - request
+   * @param httpRequest
+   *          - httpRequest
+   * @param redirectAttrs
+   *          - redirectAttrs
+   * @return {@link InvoicePaymentResponse}
+   * @throws IOException
+   *           - IOException
+   * @throws URISyntaxException
+   *           - URISyntaxException
+   */
   @PostMapping(value = "/payInvoice")
   @ApiOperation(value = "Pay invoices (1..n)")
   public InvoicePaymentResponse payInvoice(@RequestBody InvoicePaymentRequest request,
@@ -74,6 +113,17 @@ public class InvoiceController {
     }
   }
 
+  /**
+   * Payment form processor.
+   * 
+   * @param card
+   *          - card
+   * @param result
+   *          - result
+   * @param model
+   *          - model
+   * @return page
+   */
   @PostMapping(value = "/doPayment")
   public String doPayment(@ModelAttribute("card") Card card, BindingResult result, ModelMap model) {
     List<PaymentOrderResult> errors = invoiceService.performPayment(card,

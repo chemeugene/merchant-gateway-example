@@ -12,12 +12,14 @@ services:
     networks:
       - ch_network      
   merchant:
-    image: ivlev/merchant:1
+    image: merchant/merchant:1
     environment:
       JAVA_OPTS: "-Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=8000"
       DB_URL: jdbc:postgresql://postgres:5432/merchant
       DB_USER: merchant
       DB_PASS: merchant
+      ALFA_LOGIN: all_recipes_test-api
+      ALFA_PASS: all_recipes_test*?1
     ports:
       - 8080:8080
       - 8000:8000

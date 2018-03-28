@@ -12,7 +12,7 @@ import org.springframework.web.context.WebApplicationContext;
 import ru.paymentgate.engine.webservices.merchant.RegisterOrderResponse;
 
 @Component
-@Scope(value = WebApplicationContext.SCOPE_SESSION, proxyMode=ScopedProxyMode.TARGET_CLASS)
+@Scope(value = WebApplicationContext.SCOPE_SESSION, proxyMode = ScopedProxyMode.TARGET_CLASS)
 public class InvoiceSession {
 
   private Map<Integer, List<RegisterOrderResponse>> ordersByBulkInvoiceKey = 

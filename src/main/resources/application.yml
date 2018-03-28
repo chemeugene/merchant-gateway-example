@@ -10,7 +10,7 @@ security:
   require-ssl: true
 alfabank:
   login: all_recipes_test-api
-  password: all_recipes_test*?1    
+  password: all_recipes_test*?1
 spring:
   mvc:
     view:
